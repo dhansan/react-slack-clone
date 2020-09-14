@@ -14,11 +14,12 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import 'semantic-ui-css/semantic.min.css';
 // Link
 import App from './components/App';
-import Register from './components/Auth/Register';
-import Login from './components/Auth/Login';
-import firebase from './components/Firebase/firebase';
-import rootReducer from './components/Redux/reducers';
-import { setUser } from './components/Redux/actions';
+import Register from './components/Organisms/Auth/Register';
+import Login from './components/Organisms/Auth/Login';
+import firebase from './components/Config/Firebase/firebase';
+import rootReducer from './components/Config/Redux/reducers';
+import { setUser } from './components/Config/Redux/actions';
+import Spinner from './components/Atoms/Spinner/Spinner';
 import * as serviceWorker from './serviceWorker';
 
 const store = createStore(rootReducer, composeWithDevTools());
@@ -35,7 +36,9 @@ class Root extends React.Component {
   }
 
   render() {
-    return (
+    return this.props.isLoading ? (
+      <Spinner />
+    ) : (
       <Switch>
         <Route exact path="/" component={App} />
         <Route path="/login" component={Login} />
@@ -45,7 +48,11 @@ class Root extends React.Component {
   }
 }
 
-const RootwithAuth = withRouter(connect(null, { setUser })(Root));
+const mapStateFromProps = (state) => ({
+  isLoading: state.user.isLoading,
+});
+
+const RootwithAuth = withRouter(connect(mapStateFromProps, { setUser })(Root));
 
 ReactDOM.render(
   <Provider store={store}>
