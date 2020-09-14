@@ -18,7 +18,7 @@ import Register from './components/Organisms/Auth/Register';
 import Login from './components/Organisms/Auth/Login';
 import firebase from './components/Config/Firebase/firebase';
 import rootReducer from './components/Config/Redux/reducers';
-import { setUser } from './components/Config/Redux/actions';
+import { setUser, clearUser } from './components/Config/Redux/actions';
 import Spinner from './components/Atoms/Spinner/Spinner';
 import * as serviceWorker from './serviceWorker';
 
@@ -31,6 +31,9 @@ class Root extends React.Component {
         // console.log(user);
         this.props.setUser(user);
         this.props.history.push('/');
+      } else {
+        this.props.history.push('/login');
+        this.props.clearUser();
       }
     });
   }
@@ -52,7 +55,9 @@ const mapStateFromProps = (state) => ({
   isLoading: state.user.isLoading,
 });
 
-const RootwithAuth = withRouter(connect(mapStateFromProps, { setUser })(Root));
+const RootwithAuth = withRouter(
+  connect(mapStateFromProps, { setUser, clearUser })(Root)
+);
 
 ReactDOM.render(
   <Provider store={store}>
