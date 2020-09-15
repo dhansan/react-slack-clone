@@ -33,11 +33,11 @@ class Login extends React.Component {
       firebase
         .auth()
         .signInWithEmailAndPassword(this.state.email, this.state.password)
-        .then((signedUser) => {
-          console.log(signedUser);
+        .then((signedInUser) => {
+          console.log(signedInUser);
         })
         .catch((err) => {
-          console.log(err);
+          console.error(err);
           this.setState({
             errors: this.state.errors.concat(err),
             loading: false,
@@ -58,9 +58,10 @@ class Login extends React.Component {
 
   render() {
     const { email, password, errors, loading } = this.state;
+
     return (
       <Grid textAlign="center" verticalAlign="middle" className="app">
-        <Grid.Column style={{ maxwidth: 450 }}>
+        <Grid.Column style={{ maxWidth: 450 }}>
           <Header as="h1" icon color="violet" textAlign="center">
             <Icon name="code branch" color="violet" />
             Login to DevChat
