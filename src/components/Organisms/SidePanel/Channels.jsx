@@ -8,14 +8,26 @@ class Channels extends Component {
     channels: [],
     channelName: '',
     channelDetails: '',
-    channelRef: firebase.database().ref('channels'),
+    channelsRef: firebase.database().ref('channels'),
     modal: false,
   };
 
-  addChannel = () => {
-    const { channelRef, channelName, channelDetails, user } = this.state;
+  componentDidMount() {
+    this.addListeners();
+  }
 
-    const key = channelRef.push().key;
+  addListeners = () => {
+    let loadedChannels = [];
+    this.state.channelsRef.on('child_added', (snap) => {
+      loadedChannels.push(snap.val());
+      this.setState({ channels: loadedChannels });
+    });
+  };
+
+  addChannel = () => {
+    const { channelsRef, channelName, channelDetails, user } = this.state;
+
+    const key = channelsRef.push().key;
 
     const newChannel = {
       id: key,
@@ -27,19 +39,16 @@ class Channels extends Component {
       },
     };
 
-    channelRef
+    channelsRef
       .child(key)
       .update(newChannel)
       .then(() => {
-        this.setState({
-          channelName: '',
-          channelDetails: '',
-        });
+        this.setState({ channelName: '', channelDetails: '' });
         this.closeModal();
         console.log('channel added');
       })
       .catch((err) => {
-        console.log(err);
+        console.error(err);
       });
   };
 
@@ -54,6 +63,19 @@ class Channels extends Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
+  displayChannels = (channels) =>
+    channels.length > 0 &&
+    channels.map((channel) => (
+      <Menu.Item
+        key={channel.id}
+        onClick={() => console.log(channel)}
+        name={channel.name}
+        style={{ opacity: 0.7 }}
+      >
+        # {channel.name}
+      </Menu.Item>
+    ));
+
   isFormValid = ({ channelName, channelDetails }) =>
     channelName && channelDetails;
 
@@ -63,6 +85,7 @@ class Channels extends Component {
 
   render() {
     const { channels, modal } = this.state;
+
     return (
       <React.Fragment>
         <Menu.Menu style={{ paddingBottom: '2em' }}>
@@ -72,8 +95,9 @@ class Channels extends Component {
             </span>{' '}
             ({channels.length}) <Icon name="add" onClick={this.openModal} />
           </Menu.Item>
-          {/* Channels */}
+          {this.displayChannels(channels)}
         </Menu.Menu>
+
         {/* Add Channel Modal */}
         <Modal basic open={modal} onClose={this.closeModal}>
           <Modal.Header>Add a Channel</Modal.Header>
