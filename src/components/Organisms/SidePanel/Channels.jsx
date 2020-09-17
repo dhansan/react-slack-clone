@@ -20,6 +20,10 @@ class Channels extends Component {
     this.addListeners();
   }
 
+  componentWillUnmount() {
+    this.removeListeners();
+  }
+
   addListeners = () => {
     let loadedChannels = [];
     this.state.channelsRef.on('child_added', (snap) => {
@@ -28,9 +32,12 @@ class Channels extends Component {
     });
   };
 
+  removeListeners = () => {
+    this.state.channelsRef.off();
+  };
+
   setFirstChannel = () => {
     const firstChannel = this.state.channels[0];
-
     if (this.state.firstLoad && this.state.channels.length > 0) {
       this.props.setCurrentChannel(firstChannel);
       this.setActiveChannel(firstChannel);
