@@ -136,14 +136,8 @@ class MessageForm extends Component {
   };
 
   render() {
-    const {
-      errors,
-      message,
-      loading,
-      modal,
-      uploadState,
-      percentUploaded,
-    } = this.state;
+    // prettier-ignore
+    const { errors, message, loading, modal, uploadState, percentUploaded } = this.state;
 
     return (
       <Segment className="message__form">
