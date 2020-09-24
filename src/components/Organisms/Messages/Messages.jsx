@@ -28,6 +28,7 @@ class Messages extends Component {
 
     if (channel && user) {
       this.addListeners(channel.id);
+      this.addUserStarsListener(channel.id, user.uid);
     }
   }
 
@@ -46,6 +47,20 @@ class Messages extends Component {
       });
       this.countUniqueUsers(loadedMessages);
     });
+  };
+
+  addUserStarsListener = (channelId, userId) => {
+    this.state.usersRef
+      .child(userId)
+      .child('starred')
+      .once('value')
+      .then((data) => {
+        if (data.val() !== null) {
+          const channelIds = Object.keys(data.val());
+          const prevStarred = channelIds.includes(channelId);
+          this.setState({ isChannelStarred: prevStarred });
+        }
+      });
   };
 
   getMessagesRef = () => {
@@ -68,9 +83,9 @@ class Messages extends Component {
         [this.state.channel.id]: {
           name: this.state.channel.name,
           details: this.state.channel.details,
-          createBy: {
-            name: this.state.channel.createBy.name,
-            avatar: this.state.channel.createBy.avatar,
+          createdBy: {
+            name: this.state.channel.createdBy.name,
+            avatar: this.state.channel.createdBy.avatar,
           },
         },
       });
@@ -80,7 +95,7 @@ class Messages extends Component {
         .child(this.state.channel.id)
         .remove((err) => {
           if (err !== null) {
-            console.log(err);
+            console.error(err);
           }
         });
     }
