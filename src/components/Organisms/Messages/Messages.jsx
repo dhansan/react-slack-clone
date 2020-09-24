@@ -14,7 +14,9 @@ class Messages extends Component {
     messages: [],
     messagesLoading: true,
     channel: this.props.currentChannel,
+    isChannelStarred: false,
     user: this.props.currentUser,
+    usersRef: firebase.database().ref('users'),
     numUniqueUsers: '',
     searchTerm: '',
     searchLoading: false,
@@ -49,6 +51,39 @@ class Messages extends Component {
   getMessagesRef = () => {
     const { messagesRef, privateMessagesRef, privateChannel } = this.state;
     return privateChannel ? privateMessagesRef : messagesRef;
+  };
+
+  handleStar = () => {
+    this.setState(
+      (prevState) => ({
+        isChannelStarred: !prevState.isChannelStarred,
+      }),
+      () => this.starChannel()
+    );
+  };
+
+  starChannel = () => {
+    if (this.state.isChannelStarred) {
+      this.state.usersRef.child(`${this.state.user.uid}/starred`).update({
+        [this.state.channel.id]: {
+          name: this.state.channel.name,
+          details: this.state.channel.details,
+          createBy: {
+            name: this.state.channel.createBy.name,
+            avatar: this.state.channel.createBy.avatar,
+          },
+        },
+      });
+    } else {
+      this.state.usersRef
+        .child(`${this.state.user.uid}/starred`)
+        .child(this.state.channel.id)
+        .remove((err) => {
+          if (err !== null) {
+            console.log(err);
+          }
+        });
+    }
   };
 
   handleSearchChange = (event) => {
@@ -107,7 +142,7 @@ class Messages extends Component {
 
   render() {
     // prettier-ignore
-    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel } = this.state;
+    const { messagesRef, messages, channel, user, numUniqueUsers, searchTerm, searchResults, searchLoading, privateChannel, isChannelStarred } = this.state;
 
     return (
       <React.Fragment>
@@ -117,6 +152,8 @@ class Messages extends Component {
           handleSearchChange={this.handleSearchChange}
           searchLoading={searchLoading}
           isPrivateChannel={privateChannel}
+          handleStar={this.handleStar}
+          isChannelStarred={isChannelStarred}
         />
 
         <Segment>
