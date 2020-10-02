@@ -7,6 +7,7 @@ import { Segment, Comment } from 'semantic-ui-react';
 import MessageForm from './MessageForm';
 import MessagesHeader from './MessagesHeader';
 import Message from './Message';
+import Typing from './Typing';
 
 class Messages extends Component {
   state = {
@@ -194,6 +195,9 @@ class Messages extends Component {
             {searchTerm
               ? this.displayMessages(searchResults)
               : this.displayMessages(messages)}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="user__typing">scott is typing</span> <Typing />
+            </div>
           </Comment.Group>
         </Segment>
 
